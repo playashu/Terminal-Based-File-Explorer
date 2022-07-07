@@ -17,8 +17,7 @@ string getPresentDirectory(){
     getcwd(cwd, 500);       //if path length greater than 500, will 
                             //return NULL and 
                             //set errno variable (definded in errorno.h)
-                            //to the repective integer. 
-                            //header file
+                            //to the repective integer.
                             //should have done ERROR check over here!
     return cwd;
 }
