@@ -70,6 +70,117 @@ int copyDir(string folderPath,string destination){                  //assuming g
 }
 
 //***********************************************************//
+//For creating a file
+//***********************************************************//
+void createFile(string path){
+    struct stat info;
+    if(stat(path.c_str(), &info) != 0){ 
+        int f=open(path.c_str(), O_WRONLY | O_CREAT, 0644);    
+        if(f==-1){
+            cout<<"Error Creating File";
+        }else{
+            cout<<"File Created";
+        }
+        close(f);
+        // ofstream outfile;
+        // string createFile = "";
+        // createFile = getAbsolutePath(curr_command[2] + "/" + curr_command[1]);    
+        // //cout<<createFile;
+        // outfile.open(createFile.c_str());       
+        // outfile.close();   
+    }else{
+        cout<<"File Already Exists!";
+    }  
+}
+
+//***********************************************************//
+//for renaming files 
+//***********************************************************//
+void rename(string s1,string s2){
+    struct stat info;
+    string destination=getAbsolutePath(s2);
+    if(stat(destination.c_str(), &info) == 0){ 
+        cout<<"File with the same name alreay exists!";
+    }else{  
+        string file1=getAbsolutePath(s1);
+        string file2=getAbsolutePath(s2);
+        int a=rename(file1.c_str(),file2.c_str());
+        if(a==0)
+            cout<<"File Renamed";
+        else
+            cout<<"Error Renaming";
+    }
+}
+
+//***********************************************************//
+//for jumping to directories expects absolute paths
+//***********************************************************//
+void gotoDirectory(string& curr_path){                      //expects absoulute paths
+    leftStack.push(curr_path);
+    while(!rightStack.empty()){
+        rightStack.pop();            
+    }
+    enterFolder();
+}
+//***********************************************************//
+//For copying or moving multiple directories or files
+//***********************************************************//
+void copy_move_multi(vector<string> &curr_command){
+    struct stat info;
+    int status=-1;
+    string destination=getAbsolutePath(curr_command[curr_command.size()-1]);
+    if(stat(destination.c_str(), &info) == 0){
+        mode_t perm = info.st_mode;
+        if(!(S_ISDIR(perm))){
+            cout<<"Destination Doesn't Exists";
+            return;
+        }
+    }
+    for(int i=1;i<curr_command.size()-1;i++){
+        bool present=false;
+        string path=getAbsolutePath(curr_command[i]);
+        if(stat(path.c_str(), &info) == 0){
+            mode_t perm = info.st_mode;
+            int last = path.find_last_of("/");
+            string sourcePath=path.substr(0, last);
+            string sourceName=path.substr(last+1);
+            string newPath=destination+"/"+sourceName;
+            if(stat(newPath.c_str(), &info) != 0){
+                if((S_ISDIR(perm))){
+                    status=copyDir(path,newPath);
+                }else{
+                    status=copyFile(path,newPath);
+                }
+            }else{
+                cout<<sourceName<<": Already Present: Skipped! ||";
+                continue;   
+            }
+        }else{
+            cout<<"Source Doesn't Exists";
+            break;
+        }    
+    }  
+    if(status==0){
+        cout<<"Done!";
+    } 
+}
+//***********************************************************//
+//For creating an empty directory
+//***********************************************************//
+void createDir(string path){
+    struct stat info;
+    if(stat(path.c_str(), &info) != 0){ 
+        int f = mkdir(path.c_str(),0775);
+        if(f!=0){
+            cout<<"Error Creating Directory";
+        }else{
+            cout<<"Directory Created";
+        }
+    }else{
+        cout<<"Directory Already Exists";
+    }
+}
+//***********************************************************//
 //For deleting a file
 //***********************************************************//
 void deleteFile(string path){
