@@ -7,11 +7,16 @@
 //      Although stat() call can fail for a variety of reasons
 //      like permission denied, file not readable, etc..
 //      but let'us just assume here that file don't exists!
+//
+//      A better design would have been to make every my operation 
+//      return 0 or 1, if it's 1 print the error what errno variable 
+//      points to, would have reduced the code by a lot.
 
 //***********************************************************//
 //For copying a file
+//src needs to be address of a file!!
 //***********************************************************//
-int copyFile(string src,string dest){                                 //assuming given processed/absolute path
+int copyFile(string src,string dest){                                 //assuming given processed/absolute path                                             
     int status=-1;
     struct stat info;
     std::ifstream  srcn(src.c_str(), std::ios::binary);
@@ -30,6 +35,7 @@ int copyFile(string src,string dest){                                 //assuming
 
 //***********************************************************//
 //For copying a directory recursively
+//folderPath needs to be a path to some folder!
 //***********************************************************//
 int copyDir(string folderPath,string destination){                  //assuming given processed/absolute path
     vector<string> currList=getFiles(folderPath);
@@ -92,11 +98,26 @@ void createFile(string path){
         cout<<"File Already Exists!";
     }  
 }
-
+//***********************************************************//
+//For creating an empty directory
+//***********************************************************//
+void createDir(string path){
+    struct stat info;
+    if(stat(path.c_str(), &info) != 0){ 
+        int f = mkdir(path.c_str(),0775);
+        if(f!=0){
+            cout<<"Error Creating Directory";
+        }else{
+            cout<<"Directory Created";
+        }
+    }else{
+        cout<<"Directory Already Exists";
+    }
+}
 //***********************************************************//
 //for renaming files 
 //***********************************************************//
-void rename(string s1,string s2){
+void renameFile(string s1,string s2){
     struct stat info;
     string destination=getAbsolutePath(s2);
     if(stat(destination.c_str(), &info) == 0){ 
@@ -164,22 +185,7 @@ void copy_move_multi(vector<string> &curr_command){
         cout<<"Done!";
     } 
 }
-//***********************************************************//
-//For creating an empty directory
-//***********************************************************//
-void createDir(string path){
-    struct stat info;
-    if(stat(path.c_str(), &info) != 0){ 
-        int f = mkdir(path.c_str(),0775);
-        if(f!=0){
-            cout<<"Error Creating Directory";
-        }else{
-            cout<<"Directory Created";
-        }
-    }else{
-        cout<<"Directory Already Exists";
-    }
-}
+
 //***********************************************************//
 //For deleting a file
 //***********************************************************//
@@ -192,8 +198,10 @@ void deleteFile(string path){
         }else{
             int f= remove(path.c_str());
             if(f!=0){
-               cout<<"Error Deleting";
-            } 
+                cout<<"Error Deleting";
+            }else{
+                cout<<"File Deleted"; 
+            }
         }
     }else{
         cout<<"File Don't exist";

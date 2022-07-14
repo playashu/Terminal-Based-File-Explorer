@@ -51,7 +51,7 @@ extern void deleteFile(string);
 extern void copy_move_multi(vector<string>);
 extern void createDir(string);
 extern void gotoDirectory(string);
-extern void rename(string,string);
+extern void renameFile(string,string);
 extern void createFile(string);
 extern int kbhit(void);
 extern int getch(void);

@@ -32,8 +32,9 @@ void executeCommand(string command){
             if(curr_command.size()==2){
                 string path=getAbsolutePath(curr_command[1]);
                 deleteFile(path); 
-                cout<<"File Deleted"; 
-            }  
+            }else{
+                cout<<"Enter Proper Argumetns";
+            }
         }else if(curr_command[0]=="delete_dir"){            //function working tested!!
            if(curr_command.size()==2 && curr_command[1]!=""){
                 string path=getAbsolutePath(curr_command[1]);
@@ -45,11 +46,15 @@ void executeCommand(string command){
             if(curr_command[1]!="" && curr_command[2]!=""){
                 string path = getAbsolutePath(curr_command[2]) + "/" + curr_command[1];
                 createFile(path);
+            }else{
+                cout<<"Enter Proper Argumetns";
             }
         }else if(curr_command[0]=="create_dir"){            //working Tested!!
             if(curr_command[1]!="" && curr_command[2]!=""){
                 string path = getAbsolutePath(curr_command[2]) + "/" + curr_command[1];    
                 createDir(path);
+            }else{
+                cout<<"Enter Proper Argumetns";
             }
         }else if(curr_command[0]=="copy" || curr_command[0]=="move"){          //createFile not worknig no matter what!!
             if(curr_command[0]=="move"){
@@ -59,16 +64,22 @@ void executeCommand(string command){
             }
             if(curr_command.size()>=3){
                 copy_move_multi(curr_command);
+            }else{
+                cout<<"Enter Proper Argumetns";
             }
 
         }else if(curr_command[0]=="rename"){
             if(curr_command[1]!="" && curr_command[2]!=""){ 
-                rename(curr_command[1],curr_command[2]);
+                renameFile(curr_command[1],curr_command[2]);
+            }else{
+                cout<<"Enter Proper Argumetns";
             }
         }else if(curr_command[0]=="goto"){
             if(curr_command[1]!=""){
                 path=getAbsolutePath(curr_command[1]);
                 gotoDirectory(path);
+            }else{
+                cout<<"Enter Proper Argumetns";
             }
         }else if(curr_command[0]=="search"){
             if(curr_command.size()==2){
@@ -78,6 +89,8 @@ void executeCommand(string command){
                 }else{
                     cout<<"False";
                 }
+            }else{
+                cout<<"Enter Proper Argumetns";
             }
         }else if(curr_command[0]=="parse"){
             for(auto i: curr_command){
@@ -89,7 +102,6 @@ void executeCommand(string command){
     }else{
         cout<<"Enter a valid command";
     }
-    // command.clear();
     cout<<"\t\tPress Any Key to Continue";
     char c;
     cin>>c;
