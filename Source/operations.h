@@ -37,38 +37,53 @@ int copyFile(string src,string dest){                                 //assuming
 //For copying a directory recursively
 //folderPath needs to be a path to some folder!
 //***********************************************************//
-int copyDir(string folderPath,string destination){                  //assuming given processed/absolute path
-    vector<string> currList=getFiles(folderPath);
+int copyDir(string folderPath, string destination){                  //assuming given processed/absolute path
+    vector<string> currList = getFiles(folderPath);
     vector<string> currFolders;
     int status=0;
     struct stat info;
     string path="";
-    int f= mkdir(destination.c_str(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    if(f==0){
-        for(auto currfile : currList){
-            path=folderPath+"/"+currfile;
-            if(stat(path.c_str(), &info) == 0){
-                mode_t perm = info.st_mode;
-                string destinationPath=destination+'/'+currfile;
-                if((S_ISDIR(perm))){
-                    if(currfile!="."&&currfile!=".."){
-                        status+=copyDir(path,destinationPath);
-                        if(status!=0){
-                            cout<<"error copying";
-                        }
-                    }
-                }else{
-                    status+=copyFile(path,destinationPath);
-                    if(status!=0){
-                        cout<<"error copying";
-                    }
-                }
+    int f = mkdir(destination.c_str(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    
+    if(f!=0){
+        //error handling
+        return -1;
+    }
+    
+    for(auto currfile : currList){
+        path=folderPath+"/"+currfile;
+        if(stat(path.c_str(), &info) != 0){
+            // no need to check current file is present or not as
+            // we are reading them from current directory
+            // condition that file did not get deleted after we read the 
+            char expt;
+            cout<<"File Found Missing/Access Restricted! Continue? (y/n)\t:";
+            cin>>expt;
+            if(expt=='y' || expt=='Y'){
+                continue;
             }else{
-                //should never happen cause we are reading the files of the curr folder!!
-                cout<<"File not present";
+                return -1;
             }
         }
+
+        mode_t perm = info.st_mode;
+        string destinationPath=destination+'/'+currfile;
+        if((S_ISDIR(perm))){
+            if(currfile!="."&&currfile!=".."){
+                status+=copyDir(path,destinationPath);
+                if(status!=0){
+                    cout<<"Error Copying";
+                }
+            }
+        }else{
+            status+=copyFile(path,destinationPath);
+            if(status!=0){
+                cout<<"Error Copying";
+            }
+        }
+        
     }
+    
     if(moveFlag==1 && status>=0){
         deleteDir(folderPath);
     }
@@ -80,40 +95,40 @@ int copyDir(string folderPath,string destination){                  //assuming g
 //***********************************************************//
 void createFile(string path){
     struct stat info;
-    if(stat(path.c_str(), &info) != 0){ 
-        int f=open(path.c_str(), O_WRONLY | O_CREAT, 0644);    
-        if(f==-1){
-            cout<<"Error Creating File";
-        }else{
-            cout<<"File Created";
-        }
-        close(f);
-        // ofstream outfile;
-        // string createFile = "";
-        // createFile = getAbsolutePath(curr_command[2] + "/" + curr_command[1]);    
-        // //cout<<createFile;
-        // outfile.open(createFile.c_str());       
-        // outfile.close();   
-    }else{
+    if(stat(path.c_str(), &info) == 0){
         cout<<"File Already Exists!";
+        return;
     }  
+
+    int f=open(path.c_str(), O_WRONLY | O_CREAT, 0644);    
+    if(f==-1){
+        //Error Handling
+        cout<<"Error Creating File";
+        return;
+    }
+
+    cout<<"File Created";
+    close(f);
+
 }
 //***********************************************************//
 //For creating an empty directory
 //***********************************************************//
 void createDir(string path){
     struct stat info;
-    if(stat(path.c_str(), &info) != 0){ 
-        int f = mkdir(path.c_str(),0775);
-        if(f!=0){
-            cout<<"Error Creating Directory";
-        }else{
-            cout<<"Directory Created";
-        }
-    }else{
+    if(stat(path.c_str(), &info) == 0){
         cout<<"Directory Already Exists";
+        return;
+    }    
+    int f = mkdir(path.c_str(),0775);
+    if(f!=0){
+        //Error Handling
+        cout<<"Error Creating Directory";
+        return;
     }
+    cout<<"Directory Created";
 }
+
 //***********************************************************//
 //for renaming files 
 //***********************************************************//
@@ -136,17 +151,20 @@ void renameFile(string s1,string s2){
 //***********************************************************//
 //for jumping to directories expects absolute paths
 //***********************************************************//
-void gotoDirectory(string& curr_path){                      //expects absoulute paths
-    leftStack.push(curr_path);
+void gotoDirectory(string path){                      
+    path = getAbsolutePath(path);
+    curr_path = path;
+    leftStack.push(path);
     while(!rightStack.empty()){
         rightStack.pop();            
     }
     enterFolder();
 }
+
 //***********************************************************//
 //For copying or moving multiple directories or files
 //***********************************************************//
-void copy_move_multi(vector<string> &curr_command){
+void copy_move_multi(vector<string> curr_command){
     struct stat info;
     int status=-1;
     string destination=getAbsolutePath(curr_command[curr_command.size()-1]);
@@ -160,26 +178,34 @@ void copy_move_multi(vector<string> &curr_command){
     for(int i=1;i<curr_command.size()-1;i++){
         bool present=false;
         string path=getAbsolutePath(curr_command[i]);
-        if(stat(path.c_str(), &info) == 0){
-            mode_t perm = info.st_mode;
-            int last = path.find_last_of("/");
-            string sourcePath=path.substr(0, last);
-            string sourceName=path.substr(last+1);
-            string newPath=destination+"/"+sourceName;
-            if(stat(newPath.c_str(), &info) != 0){
-                if((S_ISDIR(perm))){
-                    status=copyDir(path,newPath);
-                }else{
-                    status=copyFile(path,newPath);
-                }
+        if(stat(path.c_str(), &info) != 0){
+            cout<<"Source Doesn't Exists/Access Restricted! Continue? (y/n)\t:";
+            char expt;
+            cin>>expt;
+            if(expt=='y' || expt=='Y'){
+                continue;
             }else{
-                cout<<sourceName<<": Already Present: Skipped! ||";
-                continue;   
+                cout<<"Aborted!";
+                return;
+            }
+        }
+        
+        mode_t perm = info.st_mode;
+        int last = path.find_last_of("/");
+        string sourcePath=path.substr(0, last);
+        string sourceName=path.substr(last+1);
+        string newPath=destination+"/"+sourceName;
+        if(stat(newPath.c_str(), &info) != 0){
+            if((S_ISDIR(perm))){
+                status=copyDir(path,newPath);
+            }else{
+                status=copyFile(path,newPath);
             }
         }else{
-            cout<<"Source Doesn't Exists";
-            break;
-        }    
+            cout<<sourceName<<": Already Present: Skipped! ||";
+            continue;   
+        }
+        
     }  
     if(status==0){
         cout<<"Done!";
@@ -190,6 +216,7 @@ void copy_move_multi(vector<string> &curr_command){
 //For deleting a file
 //***********************************************************//
 void deleteFile(string path){
+    path = getAbsolutePath(path);
     struct stat info;
     if(stat(path.c_str(), &info) == 0){
         mode_t perm = info.st_mode;
@@ -211,44 +238,39 @@ void deleteFile(string path){
 //***********************************************************//
 //For deleting a directory recursively
 //***********************************************************//
-void deleteDir(string folderPath){                  //assuming processed/absolute Path
+void deleteDir(string folderPath){                  
+    folderPath=getAbsolutePath(folderPath);
     struct stat info;
-    if(stat(folderPath.c_str(), &info) == 0){
-        mode_t perm = info.st_mode;
-        if((S_ISDIR(perm))){
-            vector<string> currList=getFiles(folderPath);
-            vector<string> currFolders;
-            struct stat info;
-            string path="";
-            for(auto currfile : currList){
-                path=folderPath+"/"+currfile;
-                if(stat(path.c_str(), &info) == 0){
-                    mode_t perm = info.st_mode;
-                    if((S_ISDIR(perm))){
-                        if(currfile!="."&&currfile!=".."){
-                            currFolders.push_back(path);
-                        }
-                    }else{
-                        deleteFile(path);
-                    }
-                }
-            }
-            for(auto i: currFolders){
-                deleteDir(i);
-            }
-            int s=rmdir(folderPath.c_str()); 
-            if(s==-1){
-                cout<<"error Deleteing directory";
-            }
-        }else{
-            cout<<"Target Is Not a folder!";
-            return;
-        }
-    }else{
-        
-        cout<<"Folder Don't exist";
+    
+    if(stat(folderPath.c_str(), &info) != 0 || !S_ISDIR(info.st_mode)){
+        //Error Hangdling
+        cout<<"Folder Don't exist/Access Restricted";
+        return;
     }
-            
+
+    vector<string> currList = getFiles(folderPath);
+    vector<string> currFolders;
+    string path="";
+    for(auto currfile : currList){
+        path=folderPath+"/"+currfile;
+        if(stat(path.c_str(), &info) == 0){
+            mode_t perm = info.st_mode;
+            if((S_ISDIR(perm))){
+                if(currfile!="."&&currfile!=".."){
+                    currFolders.push_back(path);
+                }
+            }else{
+                deleteFile(path);
+            }
+        }
+    }
+    for(auto i: currFolders){
+        deleteDir(i);
+    }
+    int s=rmdir(folderPath.c_str()); 
+    if(s==-1){
+        cout<<"error Deleteing directory";
+    }
 }
 
 //***********************************************************//

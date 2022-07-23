@@ -48,9 +48,9 @@ extern stack<string> leftStack,rightStack;
 extern void enterFolder();
 extern void deleteDir(string);
 extern void deleteFile(string);
-extern void copy_move_multi(vector<string>);
+//extern void copy_move_multi(vector<string>);
 extern void createDir(string);
-extern void gotoDirectory(string);
+
 extern void renameFile(string,string);
 extern void createFile(string);
 extern int kbhit(void);
@@ -82,4 +82,6 @@ extern void enterCommandMode(void);
 extern void commandMode_keyListner(void);
 extern void normalMode_keyListner(void);
 extern void enterFolder(void);
+extern void gotoDirectory(string);
+extern void copy_move_multi(vector<string>);
 //################################################################################################################################################

@@ -28,35 +28,33 @@ void executeCommand(string command){
     parseCommand(command);
     cout<<"Status: ";
     if(!curr_command.empty()){
-        if(curr_command[0]=="delete_file"){                 //function working tested!!
+        if(curr_command[0]=="delete_file"){                 
             if(curr_command.size()==2){
-                string path=getAbsolutePath(curr_command[1]);
-                deleteFile(path); 
+                deleteFile(curr_command[1]); 
             }else{
                 cout<<"Enter Proper Argumetns";
             }
-        }else if(curr_command[0]=="delete_dir"){            //function working tested!!
+        }else if(curr_command[0]=="delete_dir"){            
            if(curr_command.size()==2 && curr_command[1]!=""){
-                string path=getAbsolutePath(curr_command[1]);
-                deleteDir(path);
+                deleteDir(curr_command[1]);
             }else{
                 cout<<"Enter Proper Argumetns";
             }
-        }else if(curr_command[0]=="create_file"){           //working tested!!
+        }else if(curr_command[0]=="create_file"){           
             if(curr_command[1]!="" && curr_command[2]!=""){
                 string path = getAbsolutePath(curr_command[2]) + "/" + curr_command[1];
                 createFile(path);
             }else{
                 cout<<"Enter Proper Argumetns";
             }
-        }else if(curr_command[0]=="create_dir"){            //working Tested!!
+        }else if(curr_command[0]=="create_dir"){            
             if(curr_command[1]!="" && curr_command[2]!=""){
                 string path = getAbsolutePath(curr_command[2]) + "/" + curr_command[1];    
                 createDir(path);
             }else{
                 cout<<"Enter Proper Argumetns";
             }
-        }else if(curr_command[0]=="copy" || curr_command[0]=="move"){          //createFile not worknig no matter what!!
+        }else if(curr_command[0]=="copy" || curr_command[0]=="move"){          
             if(curr_command[0]=="move"){
                 moveFlag=1;
             }else{
@@ -76,8 +74,7 @@ void executeCommand(string command){
             }
         }else if(curr_command[0]=="goto"){
             if(curr_command[1]!=""){
-                path=getAbsolutePath(curr_command[1]);
-                gotoDirectory(path);
+                gotoDirectory(curr_command[1]);
             }else{
                 cout<<"Enter Proper Argumetns";
             }
