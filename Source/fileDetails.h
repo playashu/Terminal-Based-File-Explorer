@@ -1,6 +1,5 @@
 #include "header.h"
 
-
 //***********************************************************//
 //this file is used to print various details of the file required to be displayed 
 //***********************************************************//
@@ -73,9 +72,15 @@ void printFiles(){
     clearScreen();
     int limit=LIMIT+list_top;
     files=getFiles(curr_path);
+    printHeader();
     for(int i=list_top;i<limit && i<files.size();i++){
         string filePath=getAbsolutePath(files[i]);//curr_path+'/'+files[i];
         cout<<setw(25)<<trim(files[i])<<setw(10)<<getSize(filePath)<<setw(57)<<getSecutityMeta(filePath);
     }
     gotoXY(cursor_position,0);
+}
+
+void printHeader(){
+    cout<<setw(25)<<"File Name |"<<setw(10)<<"Size |"<<setw(10)<<" Permissions |"<<setw(10)<<" User |"<<setw(10)<<" Group |"<<setw(23)<<" Timestamp "<<endl;;
+    cout<<"--------------------------------------------------------------------------------------------------\n";
 }

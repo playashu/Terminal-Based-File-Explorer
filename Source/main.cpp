@@ -8,10 +8,11 @@
 
 using namespace std; 
 
-int cursor_position=0;
+int cursor_position=START+1;
 int list_top=0;
 int moveFlag=0;
 int mode=0;
+
 string curr_path;
 /// handle when command empty!!!
 vector<string> files;

@@ -1,5 +1,7 @@
 #include "header.h"
 
+
+
 //****************************************//
 //return the present user's home directory//
 //***************************************//
@@ -102,6 +104,7 @@ vector<string> getFiles(const string p){
         perror("scandir");
     }else {
         while (i<n) {
+            
             files.push_back(list[i++]->d_name);
         }
         free(list);
@@ -117,7 +120,30 @@ void clearCommandSpace(){
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
     //window.ws_col
     printFiles();
-    gotoXY(window.ws_row,0);
+    gotoXY(window.ws_row - STATUS_ROW,0);
+    printStatus();
+    
+}
+
+
+//***********************************************************//
+//Prints status
+//***********************************************************//
+void printStatus(){
+    struct winsize window;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
+    if(mode==0){
+        cout<<"\t\t\t\t\t** Normal Mode **\n";
+        cout<<"--------------------------------------------------------------------------------------------------";
+        gotoXY(window.ws_row - COMMAND_ROW,0);
+        cout<<"* Up/Down Arrow Keys to Navigate      * Backspace - UP      * Enter - Open       * k/l - Scroll";
+        gotoXY(START+1,0);
+    }else{
+        cout<<"\t\t\t\t\t** Command Mode **\n";
+        cout<<"--------------------------------------------------------------------------------------------------";
+        gotoXY(window.ws_row - COMMAND_ROW,0);
+        cout<<"cmd :";
+    }
 }
 
 //***********************************************************//
@@ -137,11 +163,11 @@ void nonCanonicalMode(){
 void enterFolder(){
     files.clear(); //******************STRANGE!! NOT WOKING
     list_top=0;
-    cursor_position=1;
+    cursor_position=START+1;
     files=getFiles(curr_path);
     clearCommandSpace();
-    cout<<"** Normal Mode **";
-    gotoXY(0,0);
+    //cout<<"** Normal Mode **";
+    //gotoXY(0,0);
     if(mode==0){
         normalMode_keyListner();
     }else{
@@ -154,6 +180,6 @@ void enterFolder(){
 //***********************************************************//
 void enterCommandMode(){    
     clearCommandSpace();
-    cout<<setw(10)<<"** Command Mode **"<<setw(10)<<"cmd:";
+    //cout<<setw(10)<<"** Command Mode **"<<setw(10)<<"cmd:";
     commandMode_keyListner();
 }

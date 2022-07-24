@@ -34,7 +34,11 @@ using namespace std;
 #define KEY_RIGHT   67 
 #define KEY_LEFT	68                 
 #define COLON		58
+#define START 2 
+#define STATUS_ROW 2
+#define COMMAND_ROW 0
 
+extern void printHeader();
 extern int cursor_position;
 extern int list_top;
 extern int moveFlag;
@@ -83,5 +87,6 @@ extern void commandMode_keyListner(void);
 extern void normalMode_keyListner(void);
 extern void enterFolder(void);
 extern void gotoDirectory(string);
+extern void printStatus();
 extern void copy_move_multi(vector<string>);
 //################################################################################################################################################
