@@ -34,7 +34,7 @@ using namespace std;
 #define KEY_RIGHT   67 
 #define KEY_LEFT	68                 
 #define COLON		58
-#define START 2 
+#define START 3 
 #define STATUS_ROW 2
 #define COMMAND_ROW 0
 

@@ -79,8 +79,11 @@ void printFiles(){
     }
     gotoXY(cursor_position,0);
 }
+// string printCurrentPath(){
 
+// }
 void printHeader(){
+    cout<<"\033[1;32m"<<"Current Address : \t"<<curr_path<<"\033[0m"<<endl;
     cout<<setw(25)<<"File Name |"<<setw(10)<<"Size |"<<setw(10)<<" Permissions |"<<setw(10)<<" User |"<<setw(10)<<" Group |"<<setw(23)<<" Timestamp "<<endl;;
     cout<<"--------------------------------------------------------------------------------------------------\n";
 }
